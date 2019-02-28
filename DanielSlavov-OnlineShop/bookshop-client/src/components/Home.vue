@@ -58,10 +58,10 @@ export default {
     methods:{
         fetchBooks(){
             console.log("fetchBooks called")
-            productService.getBookByProductId(36)
+            productService.addAuthor("GOSHO")
             .then(data=>{
-                console.log(data.data)
-                this.skrr=data.data;
+                console.log("added author id: "+data.data.id)
+                //this.skrr=data.data;
             }).catch(err=>{
                 console.log(err)
             })
