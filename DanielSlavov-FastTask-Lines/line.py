@@ -1,7 +1,7 @@
-line_length=10
-a=2
-b=3
-c=1
+line_length=int(input())
+a=int(input())
+b=int(input())
+c=int(input())
 
 line = list(range(0,line_length))
 a_steps=list(range(0,line_length+1,a))
