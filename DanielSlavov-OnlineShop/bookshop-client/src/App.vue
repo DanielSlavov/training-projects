@@ -1,20 +1,21 @@
 <template>
   <div id="app">
-    <TestInput/>
+    <Home/>
   </div>
 </template>
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
-import TestInput from './components/TestInput.vue'
+import Home from './components/Home.vue'
 
 export default {
   name: 'app',
   components: {
     HelloWorld,
-    TestInput
+    Home
   }
 }
+
 </script>
 
 <style>

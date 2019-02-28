@@ -8,7 +8,7 @@ class Product{
     }
     
     static getBooks(dbClient,filter_obj={genre_id,author_id,publisher_id}){
-        var query="SELECT * from Products P LEFT JOIN Books B on P.id=B.product_id"
+        var query="SELECT * from Products P INNER JOIN Books B on P.id=B.product_id"
 
         if(filter_obj!={})
         {
@@ -30,7 +30,7 @@ class Product{
     }
 
     static getMerch(dbClient,filter_obj={category_id,manufacturer_id}){
-        var query="SELECT * FROM Products P LEFT JOIN Merch M on P.id=M.product_id"
+        var query="SELECT * FROM Products P INNER JOIN Merch M on P.id=M.product_id"
         
         if(filter_obj!={}){
             var params=[]
@@ -46,14 +46,15 @@ class Product{
         }
         return dbClient.query(query)
     }
+
     static getBookById(dbClient,id){
         //By product id
-        var query="SELECT * FROM Books B FULL JOIN Products P on B.product_id=P.id WHERE P.id="+id
+        var query="SELECT * FROM Products P FULL JOIN Books B on B.product_id=P.id WHERE B.product_id="+id
         return dbClient.query(query)
     }
     static getMerchById(dbClient,id){
         //By product id
-        var query="SELECT * FROM Merch M FULL JOIN Products P on M.product_id=P.id WHERE P.id="+id
+        var query="SELECT * FROM Products P FULL JOIN OtherProducts O on O.product_id=P.id WHERE O.product_id="+id
         return dbClient.query(query)
     }
     static getImages(dbClient,id){
@@ -74,16 +75,28 @@ class Product{
 
 
     static addBook(dbClient,{name,author_id,publisher_id,genre_id,description,price,quantity}){
-        //TODO
+        var queryProduct="INSERT INTO Products (name,price,quantity) VALUES ('"+name+"', "+price+", "+quantity+") RETURNING id";
+        console.log(queryProduct)
+        return dbClient.query(queryProduct).then(dbRes=>{
+            var id = dbRes.rows[0]["id"]
+            
+            var queryBook = "INSERT INTO Books (product_id,author_id,publisher_id,genre_id,description) VALUES ("
+            queryBook+=id+","+author_id+","+publisher_id+","+genre_id+",'"+description+"') RETURNING id";
+            console.log(queryBook)
+            return dbClient.query(queryBook);
+        })
+
     }
     static addMerch(dbClient,{name,manufacturer_id,category_id,genre_id,description,price,quantity}){
         //TODO
     }
-    static addToTable(dbCliend,tableName=isRequired(),{name}){//ONLY FOR ENUM TABLES!
+    static addToTable(dbClient,tableName=isRequired(),{name}){//ONLY FOR ENUM TABLES!
         //if table is NOT ENUM(has only 'id' and 'name' columns)
         //you should create a separate function
 
-        //TODO
+        var query="INSERT INTO "+tableName+" (name) VALUES ('" + name + "') RETURNING id"
+        console.log(query)
+        return dbClient.query(query);
     }
 }
 module.exports=Product

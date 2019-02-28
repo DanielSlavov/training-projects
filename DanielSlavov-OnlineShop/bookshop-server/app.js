@@ -1,6 +1,10 @@
 const {Pool} = require('pg')
 const express = require("express")
 const Product = require( "./model/Product.js")
+const bodyParser = require('body-parser');
+const multer = require('multer'); // v1.0.5
+const upload = multer(); // for parsing multipart/form-data
+var cors = require('cors');
 
 const app = express()
 const port=3002
@@ -12,6 +16,68 @@ const dbClient=new Pool({
     database:'bookshop'
 })
 
+app.use(cors());
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
+app.get('/getBookByProductId',(req,res)=>{
+    Product.getBookById(dbClient,req.query.id).then(dbres=>{
+        console.log(req.query.id)
+        res.send(dbres.rows[0])
+    })
+
+    
+})
+
+
+app.post('/addBook',(req,res)=>{
+    console.log(req.body);
+    Product.addBook(dbClient,req.body)//{name:"Book",author_id:1,publisher_id:1,genre_id:1,description:'description',price:2,quantity:3})
+    .then(dbres=>{
+        res.send("success")
+    }).catch(err=>{
+        res.send("error")
+    })
+})
+app.post('/addOtherProduct',(req,res)=>{
+    //TODO
+})
+app.post('/addAuthor',(req,res)=>{
+    Product.addToTable(dbClient,"Authors",req.body)
+    .then(dbres=>{
+        res.send(dbres.rows[0])
+    })
+})
+app.post('/addPublisher',(req,res)=>{
+    Product.addToTable(dbClient,"Publishers",req.body)
+    .then(dbres=>{
+        res.send(dbres.rows[0])
+    })
+})
+app.post('/addGenre',(req,res)=>{
+    Product.addToTable(dbClient,"Genres",req.body)
+    .then(dbres=>{
+        res.send(dbres.rows[0])
+    })
+})
+app.post('/addCategory',(req,res)=>{
+    Product.addToTable(dbClient,"Categories",req.body)
+    .then(dbres=>{
+        res.send(dbres.rows[0])
+    })
+})
+app.post('/addManufacturer',(req,res)=>{
+    Product.addToTable(dbClient,"Manufacturers",req.body)
+    .then(dbres=>{
+        res.send(dbres.rows[0])
+    })
+})
+
+
+
+
+
 app.get('/getBooks',(req,res)=>{
     Product.getBooks(
         dbClient,{
@@ -19,6 +85,7 @@ app.get('/getBooks',(req,res)=>{
             author_id:req.query.author_id,
             publisher_id:req.query.publisher_id
         }).then(dbRes=>{
+            console.log(dbRes.rows)
             res.send(dbRes.rows)
         })
 })
